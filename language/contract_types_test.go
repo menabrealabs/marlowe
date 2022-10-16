@@ -81,3 +81,29 @@ func TestTypes_IfContract(t *testing.T) {
 
 	t.Logf("Marshalled JSON: %v", string(jbytes))
 }
+
+func TestTypes_AssertContract(t *testing.T) {
+	// Should generate JSON: {"then":"close","assert":{"value":0,"lt":1}}
+	contract := m.Assert{
+		m.ValueLT{m.Constant(0), m.Constant(1)},
+		m.Close,
+	}
+
+	var testC m.Contract = m.Contract(contract)
+
+	_, ok := testC.(m.Contract)
+	if !ok {
+		t.Error("Let does not implement Contract interface.")
+	}
+
+	jbytes, err := json.Marshal(contract)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if string(jbytes) != `{"assert":{"value":0,"lt":1},"then":"close"}` {
+		t.Error("Incorrect JSON format: ", string(jbytes))
+	}
+
+	t.Logf("Marshalled JSON: %v", string(jbytes))
+}

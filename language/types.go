@@ -301,7 +301,8 @@ func (o ValueGT) isObservation() {}
 func (o ValueGT) isValue()       {}
 
 type ValueLT struct {
-	Lhs, Rhs Value
+	Value Value `json:"value"`
+	Lt    Value `json:"lt"`
 }
 
 func (o ValueLT) isObservation() {}
@@ -517,8 +518,8 @@ func (c Let) isCase()     {}
 // execution causes a warning. The Assert term might be removed from future
 // on-chain versions of Marlowe." (§2.1.6)
 type Assert struct {
-	Observation Observation
-	Contract    Contract
+	Assert   Observation `json:"assert"`
+	Continue Contract    `json:"then"`
 }
 
 func (c Assert) isContract() {}
