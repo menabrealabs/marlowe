@@ -190,7 +190,7 @@ type UseValue ValueId
 // MulValue x y, and DivValue x y provide the common arithmetic operations -
 // x, x + y, x − y, x ∗ y, and x / y, where division always rounds (truncates)
 // its result towards zero." (§2.1.5)
-type Constant big.Int
+type Constant uint64
 
 type NegValue struct{ Value Value }
 
@@ -293,7 +293,8 @@ func (o ValueGE) isObservation() {}
 func (o ValueGE) isValue()       {}
 
 type ValueGT struct {
-	Lhs, Rhs Value
+	Value Value `json:"value"`
+	Gt    Value `json:"gt"`
 }
 
 func (o ValueGT) isObservation() {}
@@ -442,9 +443,12 @@ func (c Case) isCase() {}
 // "Close is the simplest contract, when we evaluate it, the execution is completed
 // and we generate Payments §?? for the assets in the internal accounts to their
 // default owners." (§2.1.6)
-type Close struct{}
+type CloseContract string
 
-func (c Close) isContract() {}
+const Close CloseContract = "close"
+
+func (c CloseContract) isContract() {}
+func (c CloseContract) isCase()     {}
 
 // "The contract Pay a p t v c, generates a Payment from the internal account a
 // to a payee §2.1.3 p of #v Tokens and then continues to contract c. Warnings
@@ -460,16 +464,18 @@ type Pay struct {
 }
 
 func (c Pay) isContract() {}
+func (c Pay) isCase()     {}
 
 // "The contract If obs x y allows branching. We continue to branch x if the
 // Observation obs evaluates to true, or to branch y otherwise." (§2.1.6)
 type If struct {
-	Observation Observation
-	IfTrue      Contract
-	IfFalse     Contract
+	If   Observation `json:"if"`
+	Then Contract    `json:"then"`
+	Else Contract    `json:"else"`
 }
 
 func (c If) isContract() {}
+func (c If) isCase()     {}
 
 // "When is the most complex constructor for contracts, with the form When cs t c.
 // The list cs contains zero or more pairs of Actions and Contract continuations.
@@ -482,10 +488,11 @@ func (c If) isContract() {}
 type When struct {
 	Cases    []Case
 	Timeout  Timeout
-	Contract Contract
+	Continue Contract
 }
 
 func (c When) isContract() {}
+func (c When) isCase()     {}
 
 // "A Let contract Let i v c allows a contract to record a value using an identifier
 // i. In this case, the expression v is evaluated, and the result is stored with
@@ -495,12 +502,13 @@ func (c When) isContract() {}
 // or the current time, at a particular point in the execution of the contract, to
 // be used later on in contract execution." (§2.1.6)
 type Let struct {
-	ValueId  ValueId
-	Value    Value
-	Contract Contract
+	ValueId  ValueId  `json:"let"`
+	Value    Value    `json:"be"`
+	Contract Contract `json:"then"`
 }
 
 func (c Let) isContract() {}
+func (c Let) isCase()     {}
 
 // "An assertion contract Assert b c does not have any effect on the state of
 // the contract, it immediately continues as c, but it issues a warning if the
@@ -514,6 +522,7 @@ type Assert struct {
 }
 
 func (c Assert) isContract() {}
+func (c Assert) isCase()     {}
 
 // "2.1.8 State and Environment
 
