@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package language
-
+// Package language contains types and methods that implement the Marlowe DSL in Go
 // See: https://github.com/input-output-hk/marlowe-cardano/tree/main/marlowe/specification
 // See: https://github.com/input-output-hk/marlowe-cardano/blob/main/marlowe/src/Language/Marlowe/Core/V1/Semantics/Types.hs
+package language
 
 import (
 	"math/big"
 )
 
-type Integer big.Int // Integer type more similar to Haskell's unbounded Integer type
+// use arbitrary-precision integers similar to Haskell's Integer primative
+type Integer big.Int
 
 // "We should separate the notions of participant, role, and address in a Marlowe
 // contract. A participant (or Party) in the contract can be represented by
@@ -35,7 +36,10 @@ type Integer big.Int // Integer type more similar to Haskell's unbounded Integer
 //
 // "An address party is defined by a Blockhain specific Address §1.4 and it cannot
 // be traded (it is fixed for the lifetime of a contract).
-//
+type Party interface {
+	isParty()
+}
+
 // "A Role, on the other hand, allows the participation of the contract to be
 // dynamic. Any user that can prove to have permission to act as RoleName
 // is able to carry out the actions assigned §2.1.6, and redeem the payments
@@ -43,11 +47,10 @@ type Integer big.Int // Integer type more similar to Haskell's unbounded Integer
 // traded. By minting multiple tokens for a particular role, several people can
 // be given permission to act on behalf of that role simultaneously, this allows
 // for more complex use cases." (§2.1.1)
-type Party interface {
-	isParty()
+type Role struct {
+	TokenName string `json:"role_token"`
 }
 
-type Role string
 type Address string
 
 func (r Role) isParty()    {}
@@ -103,7 +106,9 @@ type TimeParam string
 func (t TimeConstant) isTimeout() {}
 func (t TimeParam) isTimeout()    {}
 
-type Payee interface{ isPayee() }
+type Payee struct {
+	Party Party
+}
 
 type AccountId Party
 
@@ -190,7 +195,7 @@ type UseValue ValueId
 // MulValue x y, and DivValue x y provide the common arithmetic operations -
 // x, x + y, x − y, x ∗ y, and x / y, where division always rounds (truncates)
 // its result towards zero." (§2.1.5)
-type Constant uint64
+type Constant Integer
 
 type NegValue struct{ Value Value }
 
@@ -457,11 +462,11 @@ func (c CloseContract) isCase()     {}
 // account to make the payment in full. In the latter case, a partial payment
 // (of the available amount) is made." (§2.1.6)
 type Pay struct {
-	AccountId AccountId
-	Payee     Payee
-	Token     Token
-	Value     Value
-	Contract  Contract
+	AccountId AccountId `json:"from_account"`
+	Payee     Payee     `json:"to"`
+	Token     Token     `json:"token"`
+	Pay       Value     `json:"pay"`
+	Continue  Contract  `json:"then"`
 }
 
 func (c Pay) isContract() {}
