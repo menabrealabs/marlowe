@@ -17,12 +17,18 @@
 // See: https://github.com/input-output-hk/marlowe-cardano/blob/main/marlowe/src/Language/Marlowe/Core/V1/Semantics/Types.hs
 package language
 
-import (
-	"math/big"
-)
+import "math/big"
 
 // use arbitrary-precision integers similar to Haskell's Integer primative
-type Integer big.Int
+type IntegerString string
+
+func (v IntegerString) isValue() {}
+
+func (v IntegerString) Int() *big.Int {
+	i := big.NewInt(0)
+	i.SetString(string(v), 10)
+	return i
+}
 
 // "We should separate the notions of participant, role, and address in a Marlowe
 // contract. A participant (or Party) in the contract can be represented by
@@ -48,7 +54,7 @@ type Party interface {
 // be given permission to act on behalf of that role simultaneously, this allows
 // for more complex use cases." (§2.1.1)
 type Role struct {
-	TokenName string `json:"role_token"`
+	RoleName string `json:"role_token"`
 }
 
 type Address string
@@ -121,7 +127,7 @@ type Account struct {
 
 func (a Account) isPayee() {}
 
-type Accounts map[Account]Integer // This is a type in the Marlowe Core specs.
+type Accounts map[Account]uint64 // This is a type in the Marlowe Core specs.
 
 // "Choices – of integers – are identified by ChoiceId which is defined with a
 // canonical name and the Party who had made the choice." (§2.1.4)
@@ -135,7 +141,7 @@ type ChoiceId struct {
 // type is a tuple of integers that represents an inclusive lower and upper
 // bound." (§2.1.4)
 type Bound struct {
-	Upper, Lower Integer
+	Upper, Lower uint64
 }
 
 // "We can store a Value in the Marlowe State §2.1.8 using the Let construct
@@ -195,7 +201,7 @@ type UseValue ValueId
 // MulValue x y, and DivValue x y provide the common arithmetic operations -
 // x, x + y, x − y, x ∗ y, and x / y, where division always rounds (truncates)
 // its result towards zero." (§2.1.5)
-type Constant Integer
+type Constant uint64
 
 type NegValue struct{ Value Value }
 
@@ -398,7 +404,7 @@ type IDeposit struct {
 	AccountId AccountId
 	Party     Party
 	Token     Token
-	Value     Integer
+	Value     uint64
 }
 
 func (i IDeposit) isInput() {}

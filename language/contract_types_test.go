@@ -2,7 +2,6 @@ package language_test
 
 import (
 	"encoding/json"
-	"math/big"
 	"testing"
 
 	m "github.com/menabrealabs/marlowe/language"
@@ -17,7 +16,7 @@ func TestTypes_LetContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","let":"Number","be":1}
 	contract := m.Let{
 		"Number",
-		m.Constant(*big.NewInt(1)),
+		m.Constant(1),
 		m.Close,
 	}
 
@@ -27,7 +26,10 @@ func TestTypes_LetContract(t *testing.T) {
 func TestTypes_IfContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","if":{"value":1,"gt":0},"else":"close"}
 	contract := m.If{
-		m.ValueGT{m.Constant(*big.NewInt(1)), m.Constant(*big.NewInt(0))},
+		m.ValueGT{
+			m.Constant(1),
+			m.Constant(0),
+		},
 		m.Close,
 		m.Close,
 	}
@@ -38,7 +40,10 @@ func TestTypes_IfContract(t *testing.T) {
 func TestTypes_AssertContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","assert":{"value":0,"lt":1}}
 	contract := m.Assert{
-		m.ValueLT{m.Constant(*big.NewInt(0)), m.Constant(*big.NewInt(1))},
+		m.ValueLT{
+			m.Constant(0),
+			m.Constant(1),
+		},
 		m.Close,
 	}
 
@@ -53,7 +58,7 @@ func TestTypes_PayContract(t *testing.T) {
 		m.Role{"debitor"},
 		m.Payee{m.Role{"creditor"}},
 		m.Ada,
-		m.Constant(*big.NewInt(50000000)),
+		m.Constant(5000000),
 		m.Close,
 	}
 
