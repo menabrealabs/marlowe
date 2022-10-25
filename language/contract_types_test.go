@@ -1,7 +1,6 @@
 package language_test
 
 import (
-	"encoding/json"
 	"testing"
 
 	m "github.com/menabrealabs/marlowe/language"
@@ -65,15 +64,17 @@ func TestTypes_PayContract(t *testing.T) {
 	assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
 }
 
-func assertJson(t *testing.T, contract m.Contract, target string) {
-	jbytes, err := json.Marshal(contract)
-	if err != nil {
-		t.Error(err)
+func TestTypes_WhenContract(t *testing.T) {
+	// Should generate JSON:
+	// {"when":[{"then":"close","case":{"for_choice":{"choice_owner":{"pk_hash":"0000000000000000000000000000000000000000000000000000000000000000"},"choice_name":"option"},"choose_between":[{"to":2,"from":1}]}}],"timeout_continuation":"close","timeout":1666078977926}
+
+	contract := m.Pay{
+		m.Role{"debitor"},
+		m.Payee{m.Role{"creditor"}},
+		m.Ada,
+		m.Constant(5000000),
+		m.Close,
 	}
 
-	if string(jbytes) != target {
-		t.Error("Incorrect JSON format: ", string(jbytes))
-	}
-
-	t.Logf("Marshalled JSON: %v", string(jbytes))
+	assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
 }

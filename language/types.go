@@ -551,7 +551,7 @@ func (c Assert) isCase()     {}
 // minTime :: POSIXTime
 type State struct {
 	Accounts    Accounts
-	BoundValues map[ValueId]int
+	BoundValues map[ValueId]uint64
 	MinTime     POSIXTime
 }
 
