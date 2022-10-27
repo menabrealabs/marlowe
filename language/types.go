@@ -17,18 +17,14 @@
 // See: https://github.com/input-output-hk/marlowe-cardano/blob/main/marlowe/src/Language/Marlowe/Core/V1/Semantics/Types.hs
 package language
 
-import "math/big"
+import (
+	"fmt"
+	"math/big"
+)
 
 // use arbitrary-precision integers similar to Haskell's Integer primative
-type IntegerString string
 
-func (v IntegerString) isValue() {}
-
-func (v IntegerString) Int() *big.Int {
-	i := big.NewInt(0)
-	i.SetString(string(v), 10)
-	return i
-}
+type Integer big.Int
 
 // "We should separate the notions of participant, role, and address in a Marlowe
 // contract. A participant (or Party) in the contract can be represented by
@@ -201,7 +197,18 @@ type UseValue ValueId
 // MulValue x y, and DivValue x y provide the common arithmetic operations -
 // x, x + y, x − y, x ∗ y, and x / y, where division always rounds (truncates)
 // its result towards zero." (§2.1.5)
-type Constant uint64
+type Constant Integer
+
+func (i Constant) MarshalJSON() ([]byte, error) {
+	i2 := big.Int(i)
+	return []byte(fmt.Sprintf(`%s`, i2.String())), nil
+}
+
+func NewConstant(s string) Constant {
+	bInt := big.NewInt(0)
+	num, _ := bInt.SetString(s, 10)
+	return Constant(*num)
+}
 
 type NegValue struct{ Value Value }
 

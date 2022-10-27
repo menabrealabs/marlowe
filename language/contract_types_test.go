@@ -1,6 +1,7 @@
 package language_test
 
 import (
+	"math/big"
 	"testing"
 
 	m "github.com/menabrealabs/marlowe/language"
@@ -15,7 +16,7 @@ func TestTypes_LetContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","let":"Number","be":1}
 	contract := m.Let{
 		"Number",
-		m.Constant(1),
+		m.NewConstant("1"),
 		m.Close,
 	}
 
@@ -26,8 +27,8 @@ func TestTypes_IfContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","if":{"value":1,"gt":0},"else":"close"}
 	contract := m.If{
 		m.ValueGT{
-			m.Constant(1),
-			m.Constant(0),
+			m.NewConstant("1"),
+			m.NewConstant("0"),
 		},
 		m.Close,
 		m.Close,
@@ -40,8 +41,8 @@ func TestTypes_AssertContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","assert":{"value":0,"lt":1}}
 	contract := m.Assert{
 		m.ValueLT{
-			m.Constant(0),
-			m.Constant(1),
+			m.NewConstant("0"),
+			m.NewConstant("1"),
 		},
 		m.Close,
 	}
@@ -57,7 +58,7 @@ func TestTypes_PayContract(t *testing.T) {
 		m.Role{"debitor"},
 		m.Payee{m.Role{"creditor"}},
 		m.Ada,
-		m.Constant(5000000),
+		m.Constant(*big.NewInt(5000000)),
 		m.Close,
 	}
 
@@ -68,13 +69,11 @@ func TestTypes_WhenContract(t *testing.T) {
 	// Should generate JSON:
 	// {"when":[{"then":"close","case":{"for_choice":{"choice_owner":{"pk_hash":"0000000000000000000000000000000000000000000000000000000000000000"},"choice_name":"option"},"choose_between":[{"to":2,"from":1}]}}],"timeout_continuation":"close","timeout":1666078977926}
 
-	contract := m.Pay{
-		m.Role{"debitor"},
-		m.Payee{m.Role{"creditor"}},
-		m.Ada,
-		m.Constant(5000000),
-		m.Close,
-	}
+	// contract := m.When(
+	// 	m.Case{},
+	// 	1666078977926,
+	// 	m.Close,
+	// )
 
-	assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
+	// assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
 }
