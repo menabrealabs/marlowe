@@ -15,9 +15,9 @@ func TestTypes_CloseContract(t *testing.T) {
 func TestTypes_LetContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","let":"Number","be":1}
 	contract := m.Let{
-		Name:     "Number",
-		Value:    m.SetConstant("1"),
-		Continue: m.Close,
+		Name:  "Number",
+		Value: m.SetConstant("1"),
+		Then:  m.Close,
 	}
 
 	assertJson(t, contract, `{"let":"Number","be":1,"then":"close"}`)
@@ -44,7 +44,7 @@ func TestTypes_AssertContract(t *testing.T) {
 			Value: m.SetConstant("0"),
 			Lt:    m.SetConstant("1"),
 		},
-		Continue: m.Close,
+		Then: m.Close,
 	}
 
 	assertJson(t, contract, `{"assert":{"value":0,"lt":1},"then":"close"}`)
@@ -55,14 +55,14 @@ func TestTypes_PayContract(t *testing.T) {
 	// {"token":{"token_name":"","currency_symbol":""},"to":{"party":{"role_token":"creditor"}},"then":"close","pay":5000000,"from_account":{"role_token":"debtor"}}
 
 	contract := m.Pay{
-		m.Role{"debitor"},
-		m.Payee{m.Role{"creditor"}},
-		m.Ada,
-		m.Constant(*big.NewInt(5000000)),
-		m.Close,
+		AccountId: m.Role{"debtor"},
+		Payee:     m.Payee{m.Role{"creditor"}},
+		Token:     m.Ada,
+		Pay:       m.Constant(*big.NewInt(5_000_000)),
+		Then:      m.Close,
 	}
 
-	assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
+	assertJson(t, contract, `{"from_account":{"role_token":"debtor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
 }
 
 func TestTypes_WhenContract(t *testing.T) {

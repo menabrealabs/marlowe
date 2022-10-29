@@ -39,9 +39,9 @@ type Contract interface {
 }
 
 type Case struct {
-	Case     CaseStmt
-	Action   Action
-	Contract Contract
+	Case   CaseStmt
+	Action Action
+	Then   Contract
 }
 
 func (c Case) isCase() {}
@@ -66,7 +66,7 @@ type Pay struct {
 	Payee     Payee     `json:"to"`
 	Token     Token     `json:"token"`
 	Pay       Value     `json:"pay"`
-	Continue  Contract  `json:"then"`
+	Then      Contract  `json:"then"`
 }
 
 func (c Pay) isContract() {}
@@ -92,9 +92,9 @@ func (c If) isCase()     {}
 // continuation c is evaluated. The explicit timeout mechanism is what allows
 // Marlowe to avoid waiting forever for external inputs." (§2.1.6)
 type When struct {
-	Cases    []Case
-	Timeout  Timeout
-	Continue Contract
+	Cases   []Case
+	Timeout Timeout
+	Then    Contract
 }
 
 func (c When) isContract() {}
@@ -108,9 +108,9 @@ func (c When) isCase()     {}
 // or the current time, at a particular point in the execution of the contract, to
 // be used later on in contract execution." (§2.1.6)
 type Let struct {
-	Name     ValueId  `json:"let"`
-	Value    Value    `json:"be"`
-	Continue Contract `json:"then"`
+	Name  ValueId  `json:"let"`
+	Value Value    `json:"be"`
+	Then  Contract `json:"then"`
 }
 
 func (c Let) isContract() {}
@@ -124,7 +124,7 @@ func (c Let) isCase()     {}
 // on-chain versions of Marlowe." (§2.1.6)
 type Assert struct {
 	Observation Observation `json:"assert"`
-	Continue    Contract    `json:"then"`
+	Then        Contract    `json:"then"`
 }
 
 func (c Assert) isContract() {}
