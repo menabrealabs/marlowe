@@ -45,11 +45,27 @@ func (a Deposit) isAction() {}
 // For example, [Bound 0 0 , Bound 3 5 ] offers the choice of one of 0, 3, 4 and
 // 5." (§2.1.6)
 type Choice struct {
-	ChoiceId ChoiceId
-	Bounds   []Bound
+	ChoiceId ChoiceId `json:"for_choice"`
+	Bounds   []Bound  `json:"choose_between"`
 }
 
 func (a Choice) isAction() {}
+
+// "Choices – of integers – are identified by ChoiceId which is defined with a
+// canonical name and the Party who had made the choice." (§2.1.4)
+type ChoiceId struct {
+	Name  string `json:"choice_name"`
+	Owner Party  `json:"choice_owner"`
+}
+
+// "Choices are Bounded. As an argument for the Choice action §2.1.6, we pass
+// a list of Bounds that limit the integer that we can choose. The Bound data
+// type is a tuple of integers that represents an inclusive lower and upper
+// bound." (§2.1.4)
+type Bound struct {
+	Upper uint64 `json:"from"`
+	Lower uint64 `json:"to"`
+}
 
 // "A notification can be triggered by anyone as long as the Observation evaluates
 // to true. If multiple Notify are present in the Case list, the first one with a

@@ -31,17 +31,14 @@ package language
 // | When Case list Timeout Contract
 // | Let ValueId Value Contract
 // | Assert Observation Contract" (§2.1.6)
-type CaseStmt interface{ isCase() }
 
 type Contract interface {
-	CaseStmt
 	isContract()
 }
 
 type Case struct {
-	Case   CaseStmt
-	Action Action
-	Then   Contract
+	Action Action   `json:"case"`
+	Then   Contract `json:"then"`
 }
 
 func (c Case) isCase() {}
@@ -62,11 +59,11 @@ func (c CloseContract) isCase()     {}
 // account to make the payment in full. In the latter case, a partial payment
 // (of the available amount) is made." (§2.1.6)
 type Pay struct {
-	AccountId AccountId `json:"from_account"`
-	Payee     Payee     `json:"to"`
-	Token     Token     `json:"token"`
-	Pay       Value     `json:"pay"`
-	Then      Contract  `json:"then"`
+	From  AccountId `json:"from_account"`
+	To    Payee     `json:"to"`
+	Token Token     `json:"token"`
+	Pay   Value     `json:"pay"`
+	Then  Contract  `json:"then"`
 }
 
 func (c Pay) isContract() {}
@@ -75,9 +72,9 @@ func (c Pay) isCase()     {}
 // "The contract If obs x y allows branching. We continue to branch x if the
 // Observation obs evaluates to true, or to branch y otherwise." (§2.1.6)
 type If struct {
-	Observation Observation `json:"if"`
-	Then        Contract    `json:"then"`
-	Else        Contract    `json:"else"`
+	Observe Observation `json:"if"`
+	Then    Contract    `json:"then"`
+	Else    Contract    `json:"else"`
 }
 
 func (c If) isContract() {}
@@ -92,9 +89,9 @@ func (c If) isCase()     {}
 // continuation c is evaluated. The explicit timeout mechanism is what allows
 // Marlowe to avoid waiting forever for external inputs." (§2.1.6)
 type When struct {
-	Cases   []Case
-	Timeout Timeout
-	Then    Contract
+	Cases   []Case   `json:"when"`
+	Timeout Timeout  `json:"timeout"`
+	Then    Contract `json:"timeout_continuation"`
 }
 
 func (c When) isContract() {}
@@ -123,8 +120,8 @@ func (c Let) isCase()     {}
 // execution causes a warning. The Assert term might be removed from future
 // on-chain versions of Marlowe." (§2.1.6)
 type Assert struct {
-	Observation Observation `json:"assert"`
-	Then        Contract    `json:"then"`
+	Observe Observation `json:"assert"`
+	Then    Contract    `json:"then"`
 }
 
 func (c Assert) isContract() {}

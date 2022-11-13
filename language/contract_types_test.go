@@ -26,7 +26,7 @@ func TestTypes_LetContract(t *testing.T) {
 func TestTypes_IfContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","if":{"value":1,"gt":0},"else":"close"}
 	contract := m.If{
-		Observation: m.ValueGT{
+		Observe: m.ValueGT{
 			Value: m.SetConstant("1"),
 			Gt:    m.SetConstant("0"),
 		},
@@ -40,7 +40,7 @@ func TestTypes_IfContract(t *testing.T) {
 func TestTypes_AssertContract(t *testing.T) {
 	// Should generate JSON: {"then":"close","assert":{"value":0,"lt":1}}
 	contract := m.Assert{
-		Observation: m.ValueLT{
+		Observe: m.ValueLT{
 			Value: m.SetConstant("0"),
 			Lt:    m.SetConstant("1"),
 		},
@@ -55,11 +55,11 @@ func TestTypes_PayContract(t *testing.T) {
 	// {"token":{"token_name":"","currency_symbol":""},"to":{"party":{"role_token":"creditor"}},"then":"close","pay":5000000,"from_account":{"role_token":"debtor"}}
 
 	contract := m.Pay{
-		AccountId: m.Role{"debtor"},
-		Payee:     m.Payee{m.Role{"creditor"}},
-		Token:     m.Ada,
-		Pay:       m.Constant(*big.NewInt(5_000_000)),
-		Then:      m.Close,
+		From:  m.Role{"debtor"},
+		To:    m.Payee{m.Role{"creditor"}},
+		Token: m.Ada,
+		Pay:   m.Constant(*big.NewInt(5_000_000)),
+		Then:  m.Close,
 	}
 
 	assertJson(t, contract, `{"from_account":{"role_token":"debtor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
@@ -67,13 +67,29 @@ func TestTypes_PayContract(t *testing.T) {
 
 func TestTypes_WhenContract(t *testing.T) {
 	// Should generate JSON:
-	// {"when":[{"then":"close","case":{"for_choice":{"choice_owner":{"pk_hash":"0000000000000000000000000000000000000000000000000000000000000000"},"choice_name":"option"},"choose_between":[{"to":2,"from":1}]}}],"timeout_continuation":"close","timeout":1666078977926}
+	// {"when":[{"then":"close","case":{"for_choice":{"choice_owner":{"role_token":"creditor"},"choice_name":"option"},"choose_between":[{"to":2,"from":1}]}}],"timeout_continuation":"close","timeout":1668250824063}
 
 	contract := m.When{
-		[]m.Case{},
-		1666078977926,
-		m.Close,
+		Cases: []m.Case{
+			{
+				Action: m.Choice{
+					ChoiceId: m.ChoiceId{
+						Name:  "option",
+						Owner: m.Role{"creditor"},
+					},
+					Bounds: []m.Bound{
+						{
+							Upper: 3,
+							Lower: 2,
+						},
+					},
+				},
+				Then: m.Close,
+			},
+		},
+		Timeout: 1666078977926,
+		Then:    m.Close,
 	}
 
-	assertJson(t, contract, `{"from_account":{"role_token":"debitor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
+	assertJson(t, contract, `{"when":[{"case":{"for_choice":{"choice_name":"option","choice_owner":{"role_token":"creditor"}},"choose_between":[{"from":3,"to":2}]},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
 }

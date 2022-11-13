@@ -22,7 +22,6 @@ import (
 )
 
 // use arbitrary-precision integers similar to Haskell's Integer primative
-
 type Integer big.Int
 
 // "We should separate the notions of participant, role, and address in a Marlowe
@@ -34,12 +33,13 @@ type Integer big.Int
 //	datatype Party =
 //		Address Address
 //		| Role RoleName
-//
-// "An address party is defined by a Blockhain specific Address §1.4 and it cannot
-// be traded (it is fixed for the lifetime of a contract).
 type Party interface {
 	isParty()
 }
+
+// "An address party is defined by a Blockhain specific Address §1.4 and it cannot
+// be traded (it is fixed for the lifetime of a contract).
+type Address string
 
 // "A Role, on the other hand, allows the participation of the contract to be
 // dynamic. Any user that can prove to have permission to act as RoleName
@@ -51,8 +51,6 @@ type Party interface {
 type Role struct {
 	Name string `json:"role_token"`
 }
-
-type Address string
 
 func (r Role) isParty()    {}
 func (p Address) isParty() {}
@@ -123,21 +121,6 @@ type Account struct {
 func (a Account) isPayee() {}
 
 type Accounts map[Account]uint64 // This is a type in the Marlowe Core specs.
-
-// "Choices – of integers – are identified by ChoiceId which is defined with a
-// canonical name and the Party who had made the choice." (§2.1.4)
-type ChoiceId struct {
-	ChoiceName  string
-	ChoiceOwner Party
-}
-
-// "Choices are Bounded. As an argument for the Choice action §2.1.6, we pass
-// a list of Bounds that limit the integer that we can choose. The Bound data
-// type is a tuple of integers that represents an inclusive lower and upper
-// bound." (§2.1.4)
-type Bound struct {
-	Upper, Lower uint64
-}
 
 // "The last Values, TimeIntervalStart and TimeIntervalEnd, evaluate respectively
 // to the start or end of the validity interval for the Marlowe transaction." (§2.1.5)
