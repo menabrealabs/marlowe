@@ -12,8 +12,9 @@ func assertJson[T any](t *testing.T, contract T, target string) {
 	}
 
 	if string(jbytes) != target {
-		t.Error("Incorrect JSON format: ", string(jbytes))
+		t.Errorf("%v [Expected]", target)
+		t.Errorf("%v [Got]", string(jbytes))
+	} else {
+		t.Logf("Marshalled JSON: %v", string(jbytes))
 	}
-
-	t.Logf("Marshalled JSON: %v", string(jbytes))
 }

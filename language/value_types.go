@@ -92,29 +92,31 @@ func SetConstant(s string) Constant {
 	return Constant(*num)
 }
 
-type NegValue struct{ Neg Value }
+type NegValue struct {
+	Neg Value `json:"negate"`
+}
 
 // add() value (addition)
 type AddValue struct {
 	Add Value `json:"add"`
-	To  Value `json:"to"`
+	To  Value `json:"and"`
 }
 
 // multiply() value (multiplication)
 type MulValue struct {
 	Multiply Value `json:"multiply"`
-	By       Value `json:"by"`
+	By       Value `json:"times"`
 }
 
 // subtract() value (subtraction)
 type SubValue struct {
-	Subtract Value `json:"subtract"`
-	From     Value `json:"from"`
+	Subtract Value `json:"minus"`
+	From     Value `json:"value"`
 }
 
 // div() value (division)
 type DivValue struct {
-	Divide Value `json:"divdide"`
+	Divide Value `json:"divide"`
 	By     Value `json:"by"`
 }
 
