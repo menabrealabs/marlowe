@@ -17,6 +17,8 @@
 // See: https://github.com/input-output-hk/marlowe-cardano/blob/main/marlowe/src/Language/Marlowe/Core/V1/Semantics/Types.hs
 package language
 
+import "math/big"
+
 // "2.1.6 Actions and inputs
 //
 // Actions and Inputs are closely related. An Action can be added in a list of
@@ -92,7 +94,7 @@ type IDeposit struct {
 	AccountId AccountId
 	Party     Party
 	Token     Token
-	Value     uint64
+	Value     big.Int
 }
 
 func (i IDeposit) isInput() {}
