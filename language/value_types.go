@@ -53,8 +53,7 @@ func (v SubValue) isValue()          {}
 func (v MulValue) isValue()          {}
 func (v DivValue) isValue()          {}
 func (v ChoiceValue) isValue()       {}
-func (v TimeIntervalStart) isValue() {}
-func (v TimeIntervalEnd) isValue()   {}
+func (v TimeIntervalValue) isValue() {}
 func (v UseValue) isValue()          {}
 func (v Cond) isValue()              {}
 
@@ -63,17 +62,26 @@ func (v Cond) isValue()              {}
 
 // "AvailableMoney p t reports the amount of token t in the internal account of party p" (§2.1.5)
 type AvailableMoney struct {
-	Amount  Token
-	Account AccountId
+	Amount  Token     `json:"amount_of_token"`
+	Account AccountId `json:"in_account"`
 }
 
 // "ChoiceValue i reports the most recent value chosen for choice i, or zero if
 // no such choice has been made" (§2.1.5)
-type ChoiceValue ChoiceId
+type ChoiceValue struct {
+	Value ChoiceId `json:"value_of_choice"`
+}
 
 // "UseValue i reports the most recent value of the variable i, or zero
 // if that variable has not yet been set to a value." (§2.1.5)
-type UseValue ValueId
+type UseValue struct {
+	Value ValueId `json:"use_value"`
+}
+
+type TimeIntervalValue string
+
+const TimeIntervalStart TimeIntervalValue = "time_interval_start"
+const TimeIntervalEnd TimeIntervalValue = "time_interval_end"
 
 // "Constant v evaluates to the integer v, while NegValue x, AddValue x y, SubValue x y,
 // MulValue x y, and DivValue x y provide the common arithmetic operations -
@@ -81,6 +89,7 @@ type UseValue ValueId
 // its result towards zero." (§2.1.5)
 type Constant Integer
 
+// Make Constant a custom type for the JSON marshaller, converting big.Int to a string
 func (i Constant) MarshalJSON() ([]byte, error) {
 	i2 := big.Int(i)
 	return []byte(fmt.Sprintf(`%s`, i2.String())), nil
@@ -149,14 +158,16 @@ type Observation interface {
 // NotObs x, AndObs x y, and OrObs x y, respectively." (§2.1.5)
 
 type AndObs struct {
-	Lhs, Rhs Observation
+	Both Observation `json:"both"`
+	And  Observation `json:"and"`
 }
 
 func (o AndObs) isObservation() {}
 func (o AndObs) isValue()       {}
 
 type OrObs struct {
-	Lhs, Rhs Observation
+	Either Observation `json:"either"`
+	Or     Observation `json:"or"`
 }
 
 func (o OrObs) isObservation() {}
@@ -173,7 +184,7 @@ func (o NotObs) isValue()       {}
 // has been made thus far in the contract." (§2.1.5)
 
 type ChoseSomething struct {
-	Choice ChoiceId
+	Choice ChoiceId `json:"chose_something_for"`
 }
 
 func (o ChoseSomething) isObservation() {}
@@ -183,7 +194,8 @@ func (o ChoseSomething) isValue()       {}
 // by ValueLT x y, ValueLE x y, ValueGT x y, ValueGE x y, and ValueEQ x y." (§2.1.5)
 
 type ValueGE struct {
-	Lhs, Rhs Value
+	Value Value `json:"value"`
+	Ge    Value `json:"ge_than"`
 }
 
 func (o ValueGE) isObservation() {}
@@ -207,7 +219,7 @@ func (o ValueLT) isValue()       {}
 
 type ValueLE struct {
 	Value Value `json:"value"`
-	Le    Value `json:"le"`
+	Le    Value `json:"le_than"`
 }
 
 func (o ValueLE) isObservation() {}
@@ -215,7 +227,7 @@ func (o ValueLE) isValue()       {}
 
 type ValueEQ struct {
 	Value Value `json:"value"`
-	Eq    Value `json:"eq"`
+	Eq    Value `json:"equal_to"`
 }
 
 func (o ValueEQ) isObservation() {}
@@ -223,12 +235,10 @@ func (o ValueEQ) isValue()       {}
 
 // "The terms TrueObs and FalseObs provide the logical constants true and false." (§2.1.5)
 
-type TrueObs struct{}
+type BoolObs bool
 
-func (o TrueObs) isObservation() {}
-func (o TrueObs) isValue()       {}
+func (o BoolObs) isObservation() {}
+func (o BoolObs) isValue()       {}
 
-type FalseObs struct{}
-
-func (o FalseObs) isObservation() {}
-func (o FalseObs) isValue()       {}
+const TrueObs BoolObs = true
+const FalseObs BoolObs = false

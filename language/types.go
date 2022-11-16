@@ -124,8 +124,8 @@ type Accounts map[Account]uint64 // This is a type in the Marlowe Core specs.
 
 // "The last Values, TimeIntervalStart and TimeIntervalEnd, evaluate respectively
 // to the start or end of the validity interval for the Marlowe transaction." (§2.1.5)
-type TimeIntervalStart TimeInterval
-type TimeIntervalEnd TimeInterval
+// type TimeIntervalStart TimeInterval
+// type TimeIntervalEnd TimeInterval
 
 // "2.1.8 State and Environment
 
