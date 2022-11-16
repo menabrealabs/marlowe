@@ -34,10 +34,10 @@ type Action interface{ isAction() }
 
 // "A Deposit a p t v makes a deposit of #v Tokens t from Party p into account a." (§2.1.6)
 type Deposit struct {
-	AccountId AccountId
-	Party     Party
-	Token     Token
-	Value     Value
+	IntoAccount AccountId `json:"into_account"`
+	Party       Party     `json:"party"`
+	Token       Token     `json:"of_token"`
+	Deposits    Value     `json:"deposits"`
 }
 
 func (a Deposit) isAction() {}
@@ -73,7 +73,7 @@ type Bound struct {
 // to true. If multiple Notify are present in the Case list, the first one with a
 // true observation is matched." (§2.1.6)
 type Notify struct {
-	Observation Observation
+	If Observation `json:"notify_if"`
 }
 
 func (a Notify) isAction() {}
