@@ -20,7 +20,7 @@ package language_test
 import (
 	"testing"
 
-	m "github.com/menabrealabs/marlowe/language"
+	m "github.com/menabrealabs/marlowe/language/v1/core"
 )
 
 // Note: the Choice action is already tested in TestTypes_When() in content_types_test.go

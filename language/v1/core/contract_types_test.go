@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	m "github.com/menabrealabs/marlowe/language"
+	m "github.com/menabrealabs/marlowe/language/v1/core"
 )
 
 func TestTypes_CloseContract(t *testing.T) {

@@ -20,7 +20,7 @@ package language_test
 import (
 	"testing"
 
-	m "github.com/menabrealabs/marlowe/language"
+	m "github.com/menabrealabs/marlowe/language/v1/core"
 )
 
 // Helper function to wrap values in a basic Let contract
