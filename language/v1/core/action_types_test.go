@@ -33,7 +33,7 @@ func setupWhenContract(a m.Action) m.Contract {
 				Then:   m.Close,
 			},
 		},
-		Timeout: 1666078977926,
+		Timeout: m.POSIXTime(1666078977926),
 		Then:    m.Close,
 	}
 }

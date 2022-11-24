@@ -88,22 +88,19 @@ var Ada Token = Token{} // empty token defaults to $ADA
 // type POSIXtime int
 // type Timeout POSIXtime" (§1.4)
 
+type Timeout interface {
+	isTimeout()
+}
+
 type POSIXTime int
-type Timeout POSIXTime
+
+func (t POSIXTime) isTimeout() {}
 
 // Spec specifies a tuple, but Go doesn't have that datatype natively
 type TimeInterval struct {
 	// start is exclusive and end is inclusive
 	start, end POSIXTime
 }
-
-// These types are part of Marlowe Extended rather than Marlowe Core
-// Marlowe extended has not been formally specified.
-type TimeConstant POSIXTime
-type TimeParam string
-
-func (t TimeConstant) isTimeout() {}
-func (t TimeParam) isTimeout()    {}
 
 type Payee struct {
 	Party Party
