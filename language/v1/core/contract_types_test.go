@@ -4,12 +4,13 @@ import (
 	"math/big"
 	"testing"
 
+	assert "github.com/menabrealabs/marlowe/assertion"
 	m "github.com/menabrealabs/marlowe/language/v1/core"
 )
 
 func TestTypes_CloseContract(t *testing.T) {
 	contract := m.Close
-	assertJson(t, contract, `"close"`)
+	assert.Json(t, contract, `"close"`)
 }
 
 func TestTypes_LetContract(t *testing.T) {
@@ -20,7 +21,7 @@ func TestTypes_LetContract(t *testing.T) {
 		Then:  m.Close,
 	}
 
-	assertJson(t, contract, `{"let":"Number","be":1,"then":"close"}`)
+	assert.Json(t, contract, `{"let":"Number","be":1,"then":"close"}`)
 }
 
 func TestTypes_IfContract(t *testing.T) {
@@ -34,7 +35,7 @@ func TestTypes_IfContract(t *testing.T) {
 		Else: m.Close,
 	}
 
-	assertJson(t, contract, `{"if":{"value":1,"gt":0},"then":"close","else":"close"}`)
+	assert.Json(t, contract, `{"if":{"value":1,"gt":0},"then":"close","else":"close"}`)
 }
 
 func TestTypes_AssertContract(t *testing.T) {
@@ -47,7 +48,7 @@ func TestTypes_AssertContract(t *testing.T) {
 		Then: m.Close,
 	}
 
-	assertJson(t, contract, `{"assert":{"value":0,"lt":1},"then":"close"}`)
+	assert.Json(t, contract, `{"assert":{"value":0,"lt":1},"then":"close"}`)
 }
 
 func TestTypes_PayContract(t *testing.T) {
@@ -62,7 +63,7 @@ func TestTypes_PayContract(t *testing.T) {
 		Then:  m.Close,
 	}
 
-	assertJson(t, contract, `{"from_account":{"role_token":"debtor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
+	assert.Json(t, contract, `{"from_account":{"role_token":"debtor"},"to":{"Party":{"role_token":"creditor"}},"token":{"currency_symbol":"","token_name":""},"pay":5000000,"then":"close"}`)
 }
 
 func TestTypes_WhenContract(t *testing.T) {
@@ -91,5 +92,5 @@ func TestTypes_WhenContract(t *testing.T) {
 		Then:    m.Close,
 	}
 
-	assertJson(t, contract, `{"when":[{"case":{"for_choice":{"choice_name":"option","choice_owner":{"role_token":"creditor"}},"choose_between":[{"from":3,"to":2}]},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
+	assert.Json(t, contract, `{"when":[{"case":{"for_choice":{"choice_name":"option","choice_owner":{"role_token":"creditor"}},"choose_between":[{"from":3,"to":2}]},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
 }

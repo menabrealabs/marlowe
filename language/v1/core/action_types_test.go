@@ -20,6 +20,7 @@ package language_test
 import (
 	"testing"
 
+	assert "github.com/menabrealabs/marlowe/assertion"
 	m "github.com/menabrealabs/marlowe/language/v1/core"
 )
 
@@ -47,7 +48,7 @@ func TestTypes_Deposit(t *testing.T) {
 			Deposits:    m.SetConstant("50000000"),
 		},
 	)
-	assertJson(t, contract, `{"when":[{"case":{"into_account":{"role_token":"seller"},"party":{"role_token":"buyer"},"of_token":{"currency_symbol":"","token_name":""},"deposits":50000000},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
+	assert.Json(t, contract, `{"when":[{"case":{"into_account":{"role_token":"seller"},"party":{"role_token":"buyer"},"of_token":{"currency_symbol":"","token_name":""},"deposits":50000000},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
 }
 
 func TestTypes_Notify(t *testing.T) {
@@ -59,5 +60,5 @@ func TestTypes_Notify(t *testing.T) {
 			},
 		},
 	)
-	assertJson(t, contract, `{"when":[{"case":{"notify_if":{"value":{"use_value":"val"},"gt":10}},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
+	assert.Json(t, contract, `{"when":[{"case":{"notify_if":{"value":{"use_value":"val"},"gt":10}},"then":"close"}],"timeout":1666078977926,"timeout_continuation":"close"}`)
 }

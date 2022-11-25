@@ -1,11 +1,11 @@
-package language_test
+package assertion
 
 import (
 	"encoding/json"
 	"testing"
 )
 
-func assertJson[T any](t *testing.T, contract T, target string) {
+func Json[T any](t *testing.T, contract T, target string) {
 	jbytes, err := json.Marshal(contract)
 	if err != nil {
 		t.Error(err)

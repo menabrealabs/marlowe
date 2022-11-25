@@ -89,12 +89,12 @@ var Ada Token = Token{} // empty token defaults to $ADA
 // type Timeout POSIXtime" (§1.4)
 
 type Timeout interface {
-	isTimeout()
+	IsTimeout()
 }
 
 type POSIXTime int
 
-func (t POSIXTime) isTimeout() {}
+func (t POSIXTime) IsTimeout() {}
 
 // Spec specifies a tuple, but Go doesn't have that datatype natively
 type TimeInterval struct {

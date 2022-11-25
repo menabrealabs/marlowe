@@ -43,19 +43,19 @@ type ValueId string
 // | TimeIntervalEnd
 // | UseValue ValueId
 // | Cond Observation Value Value"
-type Value interface{ isValue() }
+type Value interface{ IsValue() }
 
-func (v AvailableMoney) isValue()    {}
-func (v Constant) isValue()          {}
-func (v NegValue) isValue()          {}
-func (v AddValue) isValue()          {}
-func (v SubValue) isValue()          {}
-func (v MulValue) isValue()          {}
-func (v DivValue) isValue()          {}
-func (v ChoiceValue) isValue()       {}
-func (v TimeIntervalValue) isValue() {}
-func (v UseValue) isValue()          {}
-func (v Cond) isValue()              {}
+func (v AvailableMoney) IsValue()    {}
+func (v Constant) IsValue()          {}
+func (v NegValue) IsValue()          {}
+func (v AddValue) IsValue()          {}
+func (v SubValue) IsValue()          {}
+func (v MulValue) IsValue()          {}
+func (v DivValue) IsValue()          {}
+func (v ChoiceValue) IsValue()       {}
+func (v TimeIntervalValue) IsValue() {}
+func (v UseValue) IsValue()          {}
+func (v Cond) IsValue()              {}
 
 // "Three of the Value terms look up information in the Marlowe state:
 // AvailableMoney, ChoiceValue & UseValue" (§2.1.5)
@@ -163,7 +163,7 @@ type AndObs struct {
 }
 
 func (o AndObs) isObservation() {}
-func (o AndObs) isValue()       {}
+func (o AndObs) IsValue()       {}
 
 type OrObs struct {
 	Either Observation `json:"either"`
@@ -171,14 +171,14 @@ type OrObs struct {
 }
 
 func (o OrObs) isObservation() {}
-func (o OrObs) isValue()       {}
+func (o OrObs) IsValue()       {}
 
 type NotObs struct {
 	Not Observation `json:"not"`
 }
 
 func (o NotObs) isObservation() {}
-func (o NotObs) isValue()       {}
+func (o NotObs) IsValue()       {}
 
 // "For the observations, the ChoseSomething i term reports whether a choice i
 // has been made thus far in the contract." (§2.1.5)
@@ -188,7 +188,7 @@ type ChoseSomething struct {
 }
 
 func (o ChoseSomething) isObservation() {}
-func (o ChoseSomething) isValue()       {}
+func (o ChoseSomething) IsValue()       {}
 
 // "Value comparisons x < y, x ≤ y, x > y, x ≥ y, and x = y are represented
 // by ValueLT x y, ValueLE x y, ValueGT x y, ValueGE x y, and ValueEQ x y." (§2.1.5)
@@ -199,7 +199,7 @@ type ValueGE struct {
 }
 
 func (o ValueGE) isObservation() {}
-func (o ValueGE) isValue()       {}
+func (o ValueGE) IsValue()       {}
 
 type ValueGT struct {
 	Value Value `json:"value"`
@@ -207,7 +207,7 @@ type ValueGT struct {
 }
 
 func (o ValueGT) isObservation() {}
-func (o ValueGT) isValue()       {}
+func (o ValueGT) IsValue()       {}
 
 type ValueLT struct {
 	Value Value `json:"value"`
@@ -215,7 +215,7 @@ type ValueLT struct {
 }
 
 func (o ValueLT) isObservation() {}
-func (o ValueLT) isValue()       {}
+func (o ValueLT) IsValue()       {}
 
 type ValueLE struct {
 	Value Value `json:"value"`
@@ -223,7 +223,7 @@ type ValueLE struct {
 }
 
 func (o ValueLE) isObservation() {}
-func (o ValueLE) isValue()       {}
+func (o ValueLE) IsValue()       {}
 
 type ValueEQ struct {
 	Value Value `json:"value"`
@@ -231,14 +231,14 @@ type ValueEQ struct {
 }
 
 func (o ValueEQ) isObservation() {}
-func (o ValueEQ) isValue()       {}
+func (o ValueEQ) IsValue()       {}
 
 // "The terms TrueObs and FalseObs provide the logical constants true and false." (§2.1.5)
 
 type BoolObs bool
 
 func (o BoolObs) isObservation() {}
-func (o BoolObs) isValue()       {}
+func (o BoolObs) IsValue()       {}
 
 const TrueObs BoolObs = true
 const FalseObs BoolObs = false
