@@ -1,0 +1,37 @@
+package parser
+
+/*
+Contract: Let ValueId Value Contract
+		  | When Cases Timeout Then
+		  | If Observation Contract Contract
+		  | Pay AccountId Payee Token Value Contract
+		  | Assert Observation Contract
+		  | Close
+
+When: ParensL+ "When" Cases Timeout Contract ParensR+
+If: ParensL+ "If" Observation Contract Contract ParensR+
+Pay: ParensL+ "Pay" Observation ParensR+
+
+Value: AvailableMoney Token AccountId
+       | Constant Int
+	   | NegValue Value
+	   | AddValue Value Value
+	   | SubValue Value Value
+	   | MulValue Value Value
+	   | DivValue Value Value
+	   | ChoiceValue ChoiceId
+	   | TimeIntervalValue TimeIntVal TimeIntVal
+	   | UseValue ValueId
+	   | Cond
+
+Cond: AndObs Observation Observation
+	  | OrObs Observation Observation
+	  | NotObs Observation
+
+
+ValueId:
+ParensL: "("
+ParensR: ")"
+Num: [0-9]*
+AlphaNum: [a-zA-Z0-9]*
+*/
