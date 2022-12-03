@@ -2,11 +2,12 @@ package translator
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"unicode"
 )
 
-type Token uint8
+type TokenType uint8
 
 const (
 	EOF = iota
@@ -18,11 +19,10 @@ const (
 	PARENS_R // )
 	SQUARE_L // [
 	SQUARE_R // ]
-	QUOTE    // "
 	COMMA    // ,
 )
 
-var tokens = []string{
+var tokens = [...]string{
 	EOF:      "EOF",
 	INVALID:  "INVALID",
 	KEYWORD:  "KEYWORD",
@@ -32,17 +32,34 @@ var tokens = []string{
 	PARENS_R: ")",
 	SQUARE_L: "[",
 	SQUARE_R: "]",
-	QUOTE:    string('"'),
 	COMMA:    ",",
 }
 
-func (t Token) String() string {
+var validKeywords = [...]string{
+	// Contracts
+	"Let", "When", "If", "Pay", "Assert", "Close",
+	//Actions
+	"Deposit", "Notify", "Choice", "ChoiceId", "Bound",
+	//Values
+	"AvailableMoney", "Constant", "NegValue", "AddValue", "SubValue", "MulValue", "DivValue",
+	"ChoiceValue", "TimeIntervalValue", "UseValue", "Cond",
+	// Observations
+	"AndObs", "OrObs", "NotObs", "ChoseSomething", "ValueGE", "ValueGT", "ValueLE", "ValueLT", "ValueEQ", "TrueObs", "FalseObs",
+}
+
+func (t TokenType) String() string {
 	return tokens[t]
 }
 
+type Token struct {
+	Type     TokenType
+	Value    string
+	Position Position
+}
+
 type Position struct {
-	line   int
-	column int
+	Line   int
+	Column int
 }
 
 type Scanner struct {
@@ -52,18 +69,18 @@ type Scanner struct {
 
 func NewScanner(reader io.Reader) *Scanner {
 	return &Scanner{
-		position: Position{line: 1, column: 0},
+		position: Position{Line: 1, Column: 0},
 		reader:   bufio.NewReader(reader),
 	}
 }
 
-func (scan *Scanner) Scan() (Position, Token, string) {
+func (scan *Scanner) Scan() Token {
 	for {
 		rune, _, err := scan.reader.ReadRune()
 
 		// Return EOF when we get an io.EOF from the reader
 		if err == io.EOF {
-			return scan.position, EOF, ""
+			return Token{Type: EOF}
 		}
 
 		// Panic on any other unhandled error
@@ -71,23 +88,26 @@ func (scan *Scanner) Scan() (Position, Token, string) {
 			panic(err)
 		}
 
-		scan.position.column++
+		scan.position.Column++
 
 		switch rune {
 		case '\n':
 			scan.resetPosition()
 		case '(':
-			return scan.position, PARENS_L, "("
+			return Token{Type: PARENS_L, Value: "(", Position: scan.position}
 		case ')':
-			return scan.position, PARENS_R, ")"
+			return Token{Type: PARENS_R, Value: ")", Position: scan.position}
 		case '[':
-			return scan.position, SQUARE_L, "["
+			return Token{Type: SQUARE_L, Value: "[", Position: scan.position}
 		case ']':
-			return scan.position, SQUARE_R, "]"
+			return Token{Type: SQUARE_R, Value: "]", Position: scan.position}
 		case ',':
-			return scan.position, COMMA, ","
+			return Token{Type: COMMA, Value: ",", Position: scan.position}
 		case '"':
-			return scan.position, STRING, string(rune) // TO-DO: Strings need to be analysed fully
+			// Scan the string including quotes
+			scan.backup()
+			str := scan.str()
+			return Token{Type: STRING, Value: str, Position: scan.position}
 		default:
 			// Ignore spaces
 			if unicode.IsSpace(rune) {
@@ -97,44 +117,72 @@ func (scan *Scanner) Scan() (Position, Token, string) {
 			// Tokenize INT
 			if unicode.IsDigit(rune) {
 				scan.backup()
-				scan.integer()
-				continue
+				num, err := scan.integer()
+
+				if err != nil {
+					return Token{Type: INVALID, Value: num, Position: scan.position}
+				}
+
+				return Token{Type: INT, Value: num, Position: scan.position}
 			}
 
 			// Tokenize keywords
-			if unicode.IsTitle(rune) {
+			if unicode.IsLetter(rune) {
 				scan.backup()
-				scan.keyword()
-				continue
+				kw := scan.keyword()
+				if scan.isValidKeyword(kw) {
+					return Token{Type: KEYWORD, Value: kw, Position: scan.position}
+				} else {
+					return Token{Type: INVALID, Value: kw}
+				}
 			}
+
+			// If the token is not caught, it is an invalid token
+			return Token{Type: INVALID, Value: string(rune), Position: scan.position}
 		}
 	}
+}
+
+func (scan *Scanner) isValidKeyword(word string) bool {
+	for _, kw := range validKeywords {
+		if word == kw {
+			return true
+		}
+	}
+	return false
 }
 
 func (scan *Scanner) backup() {
 	if err := scan.reader.UnreadRune(); err != nil {
 		panic(err)
 	}
-	scan.position.column--
+	scan.position.Column--
 }
 
-func (scan *Scanner) integer() string {
+func (scan *Scanner) integer() (string, error) {
 	var number string
 
 	for {
 		rune, _, err := scan.reader.ReadRune()
 		if err == io.EOF {
-			return number
+			return number, nil
 		}
 
-		scan.position.column++
+		scan.position.Column++
+
+		if unicode.IsLetter(rune) || unicode.IsPunct(rune) {
+			scan.backup()
+			return number, errors.New("invalid character in an integer")
+		}
 
 		if unicode.IsDigit(rune) {
 			number += string(rune)
-		} else {
-			scan.backup()
-			return number
+			continue
 		}
+
+		scan.backup()
+		return number, nil
+
 	}
 }
 
@@ -147,22 +195,40 @@ func (scan *Scanner) str() string {
 			return str
 		}
 
-		scan.position.column++
+		scan.position.Column++
 
-		if unicode.IsLetter(rune) {
+		if !unicode.IsSpace(rune) {
 			str += string(rune)
-		} else {
-			scan.backup()
-			return str
+			continue
 		}
+
+		scan.backup()
+		return str
 	}
 }
 
 func (scan *Scanner) keyword() string {
-	return "fix-me"
+	var str string
+
+	for {
+		rune, _, err := scan.reader.ReadRune()
+		if err == io.EOF {
+			return str
+		}
+
+		scan.position.Column++
+
+		if unicode.IsLetter(rune) {
+			str += string(rune)
+			continue
+		}
+
+		scan.backup()
+		return str
+	}
 }
 
 func (scan *Scanner) resetPosition() {
-	scan.position.line++
-	scan.position.column = 0
+	scan.position.Line++
+	scan.position.Column = 0
 }

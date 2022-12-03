@@ -1,16 +1,10 @@
-package parser
 
-/*
 Contract: Let ValueId Value Contract
 		  | When Cases Timeout Then
 		  | If Observation Contract Contract
 		  | Pay AccountId Payee Token Value Contract
 		  | Assert Observation Contract
 		  | Close
-
-When: ParensL+ "When" Cases Timeout Contract ParensR+
-If: ParensL+ "If" Observation Contract Contract ParensR+
-Pay: ParensL+ "Pay" Observation ParensR+
 
 Value: AvailableMoney Token AccountId
        | Constant Int
@@ -29,9 +23,44 @@ Cond: AndObs Observation Observation
 	  | NotObs Observation
 
 
-ValueId:
-ParensL: "("
-ParensR: ")"
-Num: [0-9]*
-AlphaNum: [a-zA-Z0-9]*
-*/
+Keywords:
+Contract KWs
+- Let
+- When
+- If
+- Pay
+- Assert
+- Close
+
+Value KWs
+- AvailableMoney
+- Constant
+- NegValue
+- AddValue
+- SubValue
+- MulValue
+- DivValue
+- ChoiceValue
+- TimeIntervalValue
+- UseValue
+- Cond
+
+Observation KWs
+- AndObs
+- OrObs
+- NotObs
+- ChoseSomthing
+- ValueGE
+- ValueGT
+- ValueLE
+- ValueLT
+- ValueEQ
+- TrueObs
+- FalseObs
+
+Action KWs
+- Deposit
+- Choice
+- ChoiceId
+- Bound
+- Notify
