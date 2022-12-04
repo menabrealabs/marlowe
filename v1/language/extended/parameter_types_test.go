@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	assert "github.com/menabrealabs/marlowe/assertion"
-	c "github.com/menabrealabs/marlowe/language/v1/core"
-	ext "github.com/menabrealabs/marlowe/language/v1/extended"
+	c "github.com/menabrealabs/marlowe/v1/language/core"
+	ext "github.com/menabrealabs/marlowe/v1/language/extended"
 )
 
 func TestTypes_WhenContract(t *testing.T) {

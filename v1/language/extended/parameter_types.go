@@ -18,7 +18,7 @@
 package language
 
 import (
-	core "github.com/menabrealabs/marlowe/language/v1/core"
+	core "github.com/menabrealabs/marlowe/v1/language/core"
 )
 
 // These types are part of Marlowe Extended rather than Marlowe Core

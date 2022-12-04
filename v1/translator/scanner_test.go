@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	scan "github.com/menabrealabs/marlowe/translator"
+	scan "github.com/menabrealabs/marlowe/v1/translator"
 )
 
 func testScanner(str string) []scan.Token {
@@ -86,13 +86,13 @@ func TestInvalidIntegers(t *testing.T) {
 }
 
 func TestValidStrings(t *testing.T) {
-	strs := []string{"\"name\"", "\"Buyer\"", "\"L337\"", "\"leFt&Right3\""}
+	strs := []string{"\"name\"", "\"Buyer\"", "\"L337\"", "\"LeFt & Right3\""}
 	input := strings.Join(strs, " ")
 	tokens := testScanner(input)
 
 	for i, str := range strs {
-		if tokens[i].Type != scan.STRING || tokens[i].Value != str {
-			t.Errorf("Failed to tokenize string.\nExpected: STRING\nGot: %v", tokens[i])
+		if tokens[i].Type != scan.STRING && tokens[i].Value != str {
+			t.Errorf("Failed to tokenize string.\nExpected: STRING %v\nGot: %v", str, tokens[i])
 		}
 	}
 }

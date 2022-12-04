@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	assert "github.com/menabrealabs/marlowe/assertion"
-	m "github.com/menabrealabs/marlowe/language/v1/core"
+	m "github.com/menabrealabs/marlowe/v1/language/core"
 )
 
 func TestTypes_CloseContract(t *testing.T) {

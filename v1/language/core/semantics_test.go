@@ -3,7 +3,7 @@ package language_test
 import (
 	"testing"
 
-	lang "github.com/menabrealabs/marlowe/language/v1/core"
+	lang "github.com/menabrealabs/marlowe/v1/language/core"
 )
 
 func TestAddress_ValidateEncoding_ShouldPass(t *testing.T) {
